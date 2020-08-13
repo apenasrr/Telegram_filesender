@@ -14,6 +14,52 @@ import pyperclip
 import pandas as pd
 
 
+def ask_create_or_use():
+
+    def create_report_descriptions():
+
+        def gen_data_frame(path_folder):
+            
+            list_data = []
+            for root, dirs, files in os.walk(path_folder):
+                for file in files:
+                    d = {}
+                    d['file_output'] = file
+                    d['description'] = file
+                    list_data.append(d)
+            
+            df = pd.DataFrame(list_data)
+            list_columns = ['file_output', 'description']
+            df = df.reindex(list_columns, axis=1)
+            
+            return df
+
+        str_msg_paste_folder = 'Paste the path folder with your files'
+        str_msg_paste_here = 'Paste here: '
+        
+        print(str_msg_paste_folder)
+        path_folder = input(str_msg_paste_here)
+        df = gen_data_frame(path_folder)
+        df.to_excel('list.xlsx', index=False)
+        
+    
+    str_msg_create_or_use_1 = 'About the list.xlsx report'
+    str_msg_create_or_use_2 = '1-Use existing (default)'
+    str_msg_create_or_use_3 = '2-Create a new one\n'
+    str_msg_answer = 'Type the number: '
+    
+    print(str_msg_create_or_use_1)
+    print(str_msg_create_or_use_2)
+    print(str_msg_create_or_use_3)
+    
+    create_or_use_answer = input(str_msg_answer)
+    if create_or_use_answer == '2':
+        create_report_descriptions()
+        input('Report Created. Press a key to continue.')
+    else:
+        pass
+        
+
 def set_win_positions():
     """
     Keep the 'windows explorer' windows in front
@@ -31,7 +77,7 @@ def set_win_positions():
 def change_between_telegram_winexplorer():
 
     pag.hotkey('alt', 'tab')
-    time.sleep(0.5)
+    time.sleep(1)
     
 
 def get_list_desc():
@@ -43,9 +89,10 @@ def get_list_desc():
 
 def paste_on_telegram_app(desc):
 
+    time.sleep(1)
     pag.hotkey('ctrl', 'v')
     pyperclip.copy(desc)
-    time.sleep(0.5)
+    time.sleep(2)
     pag.hotkey('ctrl', 'v')
     time.sleep(0.5)
     pag.press('enter')
@@ -61,24 +108,32 @@ def main():
     The excel file 'list.xlsx' in the same folder as this script needs a column 
     named as 'description'
     Fill that column with rows with description of each file
+    If you prefer, you can generate this file automatically by selecting the 
+    option '2-Create a new one', the descriptions will be filled with the name 
+    of the files
     
     # Before start script
     Follow the steps above:
-     -create a empty folder and fill only with the files to be upload
-     -select this folder window of 'windows explorer'
-     -select first file from the folder
-     -select windows of telegram desktop app
-     -run the script 
+    1. create a empty folder and fill only with the files to be upload  
+    2. in script folder, type 'cmd' in the adress bar and press Enter  
+    3. when the cmd window open, DON'T press Enter after, but type: 
+        python telegram_filesender.py
+    4. select the files folder window
+    5. select the first file from the folder  
+    6. select the window of telegram desktop app  
+    7. select the open cmd window and press Enter  
      
     This steps are crucial because the script will constantly switch between 
      windows by alt+tab and select the file above by pressing 'down arrow key'
     """
     
+    ask_create_or_use()
+    
     set_win_positions()
     
     list_desc = get_list_desc()
-    
     qt_files = len(list_desc)
+    print(f'Send {qt_files} files')
     time.sleep(0.5)
     
     for desc in list_desc:
@@ -96,8 +151,7 @@ def main():
         change_between_telegram_winexplorer()
         pag.press('down')
         
-        return
     
-    
+
 if __name__ == "__main__":
     main()
