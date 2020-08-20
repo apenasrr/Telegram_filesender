@@ -40,10 +40,10 @@ def ask_create_or_use():
         print(str_msg_paste_folder)
         path_folder = input(str_msg_paste_here)
         df = gen_data_frame(path_folder)
-        df.to_excel('list.xlsx', index=False)
+        df.to_excel('descriptions.xlsx', index=False)
         
     
-    str_msg_create_or_use_1 = 'About the list.xlsx report'
+    str_msg_create_or_use_1 = 'About the descriptions.xlsx report'
     str_msg_create_or_use_2 = '1-Use existing (default)'
     str_msg_create_or_use_3 = '2-Create a new one\n'
     str_msg_answer = 'Type the number: '
@@ -80,9 +80,11 @@ def change_between_telegram_winexplorer():
     time.sleep(1)
     
 
-def get_list_desc():
+def get_list_desc(folder_path_descriptions):
 
-    df_list = pd.read_excel(f'list.xlsx')
+    file_path_descriptions = os.path.join(folder_path_descriptions, 
+                                          'descriptions.xlsx')
+    df_list = pd.read_excel(file_path_descriptions)
     list_desc = df_list['description'].tolist()
     
     return list_desc
@@ -98,7 +100,7 @@ def paste_on_telegram_app(desc):
     pag.press('enter')
 
 
-def main():
+def main(folder_path_descriptions):
     
     """
     An easy and automatic way to post a series of files to the telegram desktop 
@@ -129,10 +131,12 @@ def main():
     
     ask_create_or_use()
     
+    list_desc = get_list_desc(folder_path_descriptions)
+
     set_win_positions()
     
-    list_desc = get_list_desc()
     qt_files = len(list_desc)
+    
     print(f'Send {qt_files} files')
     time.sleep(0.5)
     
@@ -154,4 +158,8 @@ def main():
     
 
 if __name__ == "__main__":
-    main()
+
+    folder_script_path_relative = os.path.dirname(__file__)
+    folder_script_path = os.path.realpath(folder_script_path_relative)
+    
+    main(folder_script_path)
