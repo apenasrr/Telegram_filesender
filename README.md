@@ -4,8 +4,8 @@
 An easy and automatic way to post a series of files to the telegram desktop app, along with personalized descriptions.  
 
 ## How to use
-### About file 'list.xlsx'
-1. The excel file 'list.xlsx' in the same folder as this script needs a column named as 'description'  
+### About file 'descriptions.xlsx'
+1. The excel file 'descriptions.xlsx' in the same folder as this script needs a column named as 'description'  
 2. Fill that column with rows with description of each file  
 3. You can generate this file automatically by selecting the option '2-Create a new one', the descriptions will be filled with the name of the files  
     
@@ -21,7 +21,7 @@ Follow the steps above:
 
 This steps are crucial because the script will constantly switch between windows by alt+tab and select the file above by pressing 'down arrow key'  
 
-Last Update: 2020-08-13
+Last Update: 2020-08-20
 
 ---
 Do you wish to buy a coffee to say thanks?  
