@@ -1,0 +1,2 @@
+python telegram_filesender.py
+pause
