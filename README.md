@@ -21,7 +21,7 @@ Follow the steps above:
 
 This steps are crucial because the script will constantly switch between windows by alt+tab and select the file above by pressing 'down arrow key'  
 
-Last Update: 2020-08-20
+Last Update: 2020-10-31
 
 ---
 Do you wish to buy a coffee to say thanks?  
@@ -31,3 +31,4 @@ LBC (from LBRY) digital Wallet
 ### We recommend:  
 [mises.org](https://mises.org/) - Educate yourself about economic and political freedom  
 [lbry.tv](http://lbry.tv/) - Store files and videos on blockchain ensuring free speech  
+https://www.activism.net/cypherpunk/manifesto.html -  How encryption is essential to Free Speech and Privacy  
