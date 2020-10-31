@@ -5,6 +5,14 @@
     Create by: apenasrr
     Project origin: https://github.com/apenasrr/Telegram_filesender
 
+    Do you wish to buy a coffee to say thanks?  
+    LBC (from LBRY) digital Wallet  
+    > bFmGgebff4kRfo5pXUTZrhAL3zW2GXwJSX  
+
+    We recommend:  
+    mises.org - Educate yourself about economic and political freedom  
+    lbry.tv - Store files and videos on blockchain ensuring free speech  
+    https://www.activism.net/cypherpunk/manifesto.html -  How encryption is essential to Free Speech and Privacy  
 """
 
 import os
@@ -60,24 +68,34 @@ def ask_create_or_use():
         pass
         
 
+def pag_hotkey(key_1, key_2):
+    
+    pag.keyDown(key_1)
+    pag.keyDown(key_2)
+    pag.keyUp(key_1)
+    pag.keyUp(key_2)
+    
+
 def set_win_positions():
     """
     Keep the 'windows explorer' windows in front
     and telegram windows in back
     """
     
-    pag.hotkey('alt', 'tab')
-    time.sleep(0.5)
+    pag_hotkey('alt', 'tab')
+    time.sleep(1)
     pag.keyDown('alt')
     pag.press('tab')
+    time.sleep(0.5)
     pag.press('tab')
     pag.keyUp('alt')
+    time.sleep(0.5)
     
     
 def change_between_telegram_winexplorer():
 
-    pag.hotkey('alt', 'tab')
-    time.sleep(1)
+    pag_hotkey('alt', 'tab')
+    time.sleep(2)
     
 
 def get_list_desc(folder_path_descriptions):
@@ -91,13 +109,14 @@ def get_list_desc(folder_path_descriptions):
 
 def paste_on_telegram_app(desc):
 
-    time.sleep(1)
-    pag.hotkey('ctrl', 'v')
-    pyperclip.copy(desc)
     time.sleep(2)
-    pag.hotkey('ctrl', 'v')
-    time.sleep(0.5)
+    pag_hotkey('ctrl', 'v')
+    pyperclip.copy(desc)
+    time.sleep(3)
+    pag_hotkey('ctrl', 'v')
+    time.sleep(1)
     pag.press('enter')
+    time.sleep(1)
 
 
 def main(folder_path_descriptions):
@@ -143,7 +162,7 @@ def main(folder_path_descriptions):
     for desc in list_desc:
     
         # copy file
-        pag.hotkey('ctrl', 'c')
+        pag_hotkey('ctrl', 'c')
         
         # change to telegram
         change_between_telegram_winexplorer()
@@ -154,6 +173,7 @@ def main(folder_path_descriptions):
         # change back to windows explorer and select next file
         change_between_telegram_winexplorer()
         pag.press('down')
+        time.sleep(0.5)
         
     
 
