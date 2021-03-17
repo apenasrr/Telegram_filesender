@@ -1,0 +1,9 @@
+channel title
+
+This is some line of channel description :)
+This is some line of channel description 
+This is some line of channel description 
+
+Invitation link: {chat_invite_link}
+
+Autosend via Zimatise app!
