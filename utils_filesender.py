@@ -2,11 +2,20 @@ import os
 
 def get_txt_content(file_path):
 
-    file = open(file_path, 'r', encoding='utf-8')
+    list_encode = ['utf-8', 'ISO-8859-1'] # utf8, ansi
+    for encode in list_encode:
+        try:
+            file = open(file_path, 'r', encoding=encode)
+            file_content = file.readlines()
+            file_content = ''.join(file_content)
+            file.close()
+            return file_content
+        except:
+            continue
+
+    file = open(file_path, 'r', encoding=encode)
     file_content = file.readlines()
-    file_content = ''.join(file_content)
-    file.close()
-    return file_content
+    raise Exception('encode', f'Cannot open file: {file_path}')
 
 
 def create_txt(file_path, stringa):

@@ -1,5 +1,7 @@
 channel title
 
+title description
+
 This is some line of channel description :)
 This is some line of channel description 
 This is some line of channel description 

@@ -38,7 +38,13 @@ def progress(current, total):
 def send_video(chat_id, file_path, caption):
 
     logging.info("Sending video...")
-    metadata = ffprobe(file_path).get_output_as_dict()['streams'][0]
+    try:
+        metadata = ffprobe(file_path).get_output_as_dict()['streams'][0]
+    except:
+        
+        print(file_path)
+        print(ffprobe(file_path).get_output_as_dict())
+        metadata = ffprobe(file_path).get_output_as_dict()['streams'][0]
     width = metadata['width']
     height = metadata['height']
     duration = int(float(metadata['duration']))
@@ -87,7 +93,9 @@ def send_files(list_dict, chat_id):
     for index, d in enumerate(list_dict):
         order = index + 1
         file_path = d['file_output']
-
+        
+        #TODO: Test if file exist: {file_path}
+        
         print(f'{order}/{len_list_dict} Uploading: {file_path}')
         logging.info(f'{order}/{len_list_dict} Uploading: {file_path}')
 
