@@ -88,8 +88,6 @@ To connect to Telegram via API, it's necessary get an api_id and an api_hash. Bu
   - pyrogram (required for sending via Telegram API)
 - To install the libs, just run the file `update_libs.bat`
 
-Last Update: 2021-03-17
-
 ---
 Do you wish to buy a coffee to say thanks?
 LBC (from LBRY) digital Wallet
