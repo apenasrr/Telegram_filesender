@@ -3,3 +3,4 @@ pyperclip
 pandas
 pyrogram
 pyautogui
+tgcrypto
