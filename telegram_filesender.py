@@ -205,6 +205,8 @@ def config_channel(chat_id, list_adms, folder_path_descriptions):
 def send_via_telegram_api(list_desc, folder_path_descriptions, dict_config):
 
     chat_id = process_to_send_telegram(folder_path_descriptions, dict_config)
+    print(f'chat_id: {chat_id}')
+    print(type(chat_id))
     send_files(list_desc, chat_id)
 
 
@@ -260,7 +262,7 @@ def process_to_send_telegram(folder_path_descriptions, dict_config):
         # use existent channel
         chat_id_is_valid = test_chat_id(dict_config)
         if chat_id_is_valid:
-            chat_id = dict_config['create_id']
+            chat_id = dict_config['chat_id']
 
     return chat_id
 

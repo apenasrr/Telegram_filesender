@@ -1,6 +1,5 @@
 import sys
 import os
-import config
 
 
 def import_config():
@@ -15,15 +14,18 @@ def import_config():
 def config_data():
 
     import_config()
+    import config_tg
     d = {}
     try:
-        d['create_new_channel_flag'] = config.create_new_channel
+        d['create_new_channel_flag'] = config_tg.create_new_channel
     except:
+        print("Telegram_FileSender: Config file don't found.")
+        print("A new channel will be created by default.")
         d['create_new_channel_flag'] = 1
         pass
 
     try:
-        d['chat_id'] = config.chat_id
+        d['chat_id'] = config_tg.chat_id
     except:
         pass
     config_data = d
