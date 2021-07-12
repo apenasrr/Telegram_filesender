@@ -1,4 +1,4 @@
-from pyrogram import Client
+from pyrogram import Client, types
 import credentials
 import config
 import os
@@ -41,7 +41,7 @@ def send_video(chat_id, file_path, caption):
     try:
         metadata = ffprobe(file_path).get_output_as_dict()['streams'][0]
     except:
-        
+        # case of error, show all video metadata
         print(file_path)
         print(ffprobe(file_path).get_output_as_dict())
         metadata = ffprobe(file_path).get_output_as_dict()['streams'][0]
@@ -80,6 +80,45 @@ def get_history(chat_id):
     return return_
 
 
+def get_list_media_doc(list_dict_sent_doc):
+    """
+    Generates a list of "inputmediadocument"
+     from a list of 'return of sent files'.
+    Used to forward files in album format with 'send_media_group' method
+
+    Args:
+        list_dict_sent_doc (list):
+            List of returns from many files sent by the send_document method
+
+    Returns:
+        list: list of InputMediaDocument pyrogram type,
+               necessary to send_media_group method
+    """
+
+    list_media_doc = []
+    for dict_sent_doc in list_dict_sent_doc:
+        file_id = dict_sent_doc['file_id']
+        caption = dict_sent_doc['caption']
+        media = types.InputMediaDocument(media=file_id, caption=caption)
+        list_media_doc.append(media)
+    return list_media_doc
+
+
+def send_media_group(chat_id, list_media):
+
+    with Client('user', credentials.api_id, credentials.api_hash) as app:
+        return_ = app.send_media_group(chat_id, media=list_media)
+    return return_
+
+
+def delete_messages(chat_id, list_message_id):
+
+    with Client('user', credentials.api_id, credentials.api_hash) as app:
+        return_ = app.delete_messages(chat_id=chat_id,
+                                      message_ids=list_message_id)
+    return return_
+
+
 def send_files(list_dict, chat_id):
     """[summary]
 
@@ -89,13 +128,14 @@ def send_files(list_dict, chat_id):
             description=file description
     """
 
+    list_return = []
     len_list_dict = len(list_dict)
     for index, d in enumerate(list_dict):
         order = index + 1
         file_path = d['file_output']
-        
+
         #TODO: Test if file exist: {file_path}
-        
+
         print(f'{order}/{len_list_dict} Uploading: {file_path}')
         logging.info(f'{order}/{len_list_dict} Uploading: {file_path}')
 
@@ -107,7 +147,6 @@ def send_files(list_dict, chat_id):
         else:
             type_file = 'document'
 
-        list_return = []
         if type_file == 'video':
             return_ = send_video(chat_id=chat_id,
                                  file_path=file_path,
