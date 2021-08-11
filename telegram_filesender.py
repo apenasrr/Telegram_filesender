@@ -273,6 +273,10 @@ def main(folder_path_descriptions, dict_config):
     app, along with personalized descriptions.
 
     How to use: https://github.com/apenasrr/Telegram_filesender/blob/master/README.md
+    
+    Args:
+        folder_path_descriptions (str):
+        dict_config (dict): {create_new_channel_flag: int, chat_id: int}
     """
 
     ask_create_or_use()

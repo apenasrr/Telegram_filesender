@@ -73,6 +73,13 @@ def send_document(chat_id, file_path, caption):
     return return_
 
 
+def get_messages(chat_id, message_ids):
+
+    with Client('user', credentials.api_id, credentials.api_hash) as app:
+        return_ = app.get_messages(chat_id, message_ids)
+    return return_
+    
+
 def get_history(chat_id):
 
     with Client('user', credentials.api_id, credentials.api_hash) as app:
@@ -126,6 +133,7 @@ def send_files(list_dict, chat_id):
         list_dict (list): list of dict. dict with keys:
             file_path=Absolute file_path
             description=file description
+            file_output=file name for log
     """
 
     list_return = []
