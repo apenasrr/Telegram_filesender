@@ -1,6 +1,5 @@
 from pyrogram import Client, types
 import credentials
-import config
 import os
 import logging
 import sys
@@ -78,7 +77,7 @@ def get_messages(chat_id, message_ids):
     with Client('user', credentials.api_id, credentials.api_hash) as app:
         return_ = app.get_messages(chat_id, message_ids)
     return return_
-    
+
 
 def get_history(chat_id):
 
@@ -123,6 +122,28 @@ def delete_messages(chat_id, list_message_id):
     with Client('user', credentials.api_id, credentials.api_hash) as app:
         return_ = app.delete_messages(chat_id=chat_id,
                                       message_ids=list_message_id)
+    return return_
+
+
+def send_file(dict_file_data, chat_id):
+
+    file_path = dict_file_data['file_output']
+    description = dict_file_data['description']
+    file_extension = os.path.splitext(file_path.lower())[1]
+
+    if file_extension == '.mp4':
+        type_file = 'video'
+    else:
+        type_file = 'document'
+
+    if type_file == 'video':
+        return_ = send_video(chat_id=chat_id,
+                             file_path=file_path,
+                             caption=description)
+
+    elif type_file == 'document':
+        return_ = send_document(chat_id=chat_id,
+                                file_path=file_path, caption=description)
     return return_
 
 
