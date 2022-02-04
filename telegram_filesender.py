@@ -21,19 +21,24 @@ import time
 import pyautogui as pag
 import pyperclip
 import pandas as pd
-from api_telegram import send_file, create_channel, \
-    add_chat_members, promote_chat_members, export_chat_invite_link, \
-    get_channel_title, get_channel_description, \
-    set_chat_description, get_list_adms
+from api_telegram import (
+    send_file,
+    create_channel,
+    add_chat_members,
+    promote_chat_members,
+    export_chat_invite_link,
+    get_channel_title,
+    get_channel_description,
+    set_chat_description,
+    get_list_adms,
+)
 from config_data import config_data
 import sys
 from utils_filesender import get_txt_content, create_txt
 
 
 def ask_create_or_use():
-
     def create_report_descriptions():
-
         def gen_data_frame(path_folder):
 
             list_data = []
@@ -41,37 +46,37 @@ def ask_create_or_use():
                 for file in files:
                     d = {}
                     file_path = os.path.join(root, file)
-                    d['file_output'] = file_path
-                    d['description'] = file
+                    d["file_output"] = file_path
+                    d["description"] = file
                     list_data.append(d)
 
             df = pd.DataFrame(list_data)
-            list_columns = ['file_output', 'description']
+            list_columns = ["file_output", "description"]
             df = df.reindex(list_columns, axis=1)
 
             return df
 
-        str_msg_paste_folder = 'Paste the path folder with your files'
-        str_msg_paste_here = 'Paste here: '
+        str_msg_paste_folder = "Paste the path folder with your files"
+        str_msg_paste_here = "Paste here: "
 
         print(str_msg_paste_folder)
         path_folder = input(str_msg_paste_here)
         df = gen_data_frame(path_folder)
-        df.to_excel('descriptions.xlsx', index=False)
+        df.to_excel("descriptions.xlsx", index=False)
 
-    str_msg_create_or_use_1 = 'About the descriptions.xlsx report'
-    str_msg_create_or_use_2 = '1-Use existing (default)'
-    str_msg_create_or_use_3 = '2-Create a new one\n'
-    str_msg_answer = 'Type the number: '
+    str_msg_create_or_use_1 = "About the descriptions.xlsx report"
+    str_msg_create_or_use_2 = "1-Use existing (default)"
+    str_msg_create_or_use_3 = "2-Create a new one\n"
+    str_msg_answer = "Type the number: "
 
     print(str_msg_create_or_use_1)
     print(str_msg_create_or_use_2)
     print(str_msg_create_or_use_3)
 
     create_or_use_answer = input(str_msg_answer)
-    if create_or_use_answer == '2':
+    if create_or_use_answer == "2":
         create_report_descriptions()
-        input('Report Created. Press a key to continue.')
+        input("Report Created. Press a key to continue.")
     else:
         pass
 
@@ -90,31 +95,31 @@ def set_win_positions():
     and telegram windows in back
     """
 
-    pag_hotkey('alt', 'tab')
+    pag_hotkey("alt", "tab")
     time.sleep(1)
-    pag.keyDown('alt')
-    pag.press('tab')
+    pag.keyDown("alt")
+    pag.press("tab")
     time.sleep(0.5)
-    pag.press('tab')
-    pag.keyUp('alt')
+    pag.press("tab")
+    pag.keyUp("alt")
     time.sleep(0.5)
 
 
 def change_between_telegram_winexplorer():
 
-    pag_hotkey('alt', 'tab')
+    pag_hotkey("alt", "tab")
     time.sleep(2)
 
 
 def get_next_video_to_send(path_file_description):
 
     try:
-        df = pd.read_excel(path_file_description, engine='openpyxl')
+        df = pd.read_excel(path_file_description, engine="openpyxl")
     except Exception as e:
         print(f"Can't open file: {path_file_description}")
         print(e)
 
-    mask_df_to_send = df['sent'].isin([0])
+    mask_df_to_send = df["sent"].isin([0])
     df_to_send = df.loc[mask_df_to_send, :]
     count_files_to_send = df_to_send.shape[0]
     if count_files_to_send == 0:
@@ -129,43 +134,44 @@ def get_next_video_to_send(path_file_description):
 def update_description_file_sent(path_file_description, dict_file_data):
 
     try:
-        df = pd.read_excel(path_file_description, engine='openpyxl')
+        df = pd.read_excel(path_file_description, engine="openpyxl")
     except Exception as e:
         print(f"Can't open file: {path_file_description}")
         print(e)
 
-    file_path = dict_file_data['file_output']
-    mask_file_path = df['file_output'].isin([file_path])
+    file_path = dict_file_data["file_output"]
+    mask_file_path = df["file_output"].isin([file_path])
     df_filter = df.loc[mask_file_path, :]
     len_df_filter = len(df_filter)
     if len_df_filter != 1:
-        print(f'Find {len_df_filter} line for file: {file_path}')
+        print(f"Find {len_df_filter} line for file: {file_path}")
         sys.exit()
     index_video = df_filter.index
     # update df
-    df.loc[index_video, 'sent'] = 1
+    df.loc[index_video, "sent"] = 1
     df.to_excel(path_file_description, index=False)
 
 
 def ensure_existence_sent_column(df_list, file_path_descriptions):
 
     description_columns = df_list.columns
-    if 'sent' not in description_columns:
-        df_list['sent'] = 0
+    if "sent" not in description_columns:
+        df_list["sent"] = 0
         df_list.to_excel(file_path_descriptions, index=False)
 
 
 def get_list_desc(folder_path_descriptions):
 
-    file_path_descriptions = os.path.join(folder_path_descriptions,
-                                          'descriptions.xlsx')
-    df_list = pd.read_excel(file_path_descriptions, engine='openpyxl')
+    file_path_descriptions = os.path.join(
+        folder_path_descriptions, "descriptions.xlsx"
+    )
+    df_list = pd.read_excel(file_path_descriptions, engine="openpyxl")
 
     list_desc = []
     for _, row in df_list.iterrows():
         d = {}
-        d['file_output'] = row['file_output']
-        d['description'] = row['description']
+        d["file_output"] = row["file_output"]
+        d["description"] = row["description"]
         list_desc.append(d)
 
     return list_desc
@@ -174,21 +180,21 @@ def get_list_desc(folder_path_descriptions):
 def paste_on_telegram_app(desc):
 
     time.sleep(2)
-    pag_hotkey('ctrl', 'v')
+    pag_hotkey("ctrl", "v")
     pyperclip.copy(desc)
     time.sleep(3)
-    pag_hotkey('ctrl', 'v')
+    pag_hotkey("ctrl", "v")
     time.sleep(1)
-    pag.press('enter')
+    pag.press("enter")
     time.sleep(1)
 
 
 def ask_send_app_or_api():
 
-    str_msg_1 = 'How do you intend to send the files?'
-    str_msg_2 = '1-By telegram desktop app (default)'
-    str_msg_3 = '2-By telegram api\n'
-    str_msg_answer = 'Type the number: '
+    str_msg_1 = "How do you intend to send the files?"
+    str_msg_2 = "1-By telegram desktop app (default)"
+    str_msg_3 = "2-By telegram api\n"
+    str_msg_answer = "Type the number: "
 
     print(str_msg_1)
     print(str_msg_2)
@@ -196,7 +202,7 @@ def ask_send_app_or_api():
 
     answer = input(str_msg_answer)
 
-    if answer == '':
+    if answer == "":
         return 1
 
     int_answer = int(answer)
@@ -207,13 +213,13 @@ def send_via_telegram_app(list_desc):
 
     set_win_positions()
     qt_files = len(list_desc)
-    print(f'Send {qt_files} files')
+    print(f"Send {qt_files} files")
     time.sleep(0.5)
 
     for d in list_desc:
-        desc = d['description']
+        desc = d["description"]
         # copy file
-        pag_hotkey('ctrl', 'c')
+        pag_hotkey("ctrl", "c")
 
         # change to telegram
         change_between_telegram_winexplorer()
@@ -223,41 +229,39 @@ def send_via_telegram_app(list_desc):
 
         # change back to windows explorer and select next file
         change_between_telegram_winexplorer()
-        pag.press('down')
+        pag.press("down")
         time.sleep(0.5)
 
 
 def process_create_channel(folder_path_descriptions):
 
     title = get_channel_title(folder_path_descriptions)
-    description = 'channel description'
+    description = "channel description"
 
-    chat_id = create_channel(title=title,
-                             description=description)
+    chat_id = create_channel(title=title, description=description)
     return chat_id
 
 
-def config_channel(chat_id, chat_invite_link,
-                   list_adms,
-                   folder_path_descriptions):
+def config_channel(
+    chat_id, chat_invite_link, list_adms, folder_path_descriptions
+):
 
-    description = get_channel_description(chat_invite_link,
-                                          folder_path_descriptions)
-    set_chat_description(chat_id=chat_id,
-                         description=description)
+    description = get_channel_description(
+        chat_invite_link, folder_path_descriptions
+    )
+    set_chat_description(chat_id=chat_id, description=description)
 
     if len(list_adms) != 0:
-        add_chat_members(chat_id=chat_id,
-                         user_ids=list_adms)
-        promote_chat_members(chat_id=chat_id,
-                             user_ids=list_adms)
+        add_chat_members(chat_id=chat_id, user_ids=list_adms)
+        promote_chat_members(chat_id=chat_id, user_ids=list_adms)
 
 
 def send_via_telegram_api(folder_path_descriptions, dict_config):
 
-    file_path_descriptions = os.path.join(folder_path_descriptions,
-                                          'descriptions.xlsx')
-    df_list = pd.read_excel(file_path_descriptions, engine='openpyxl')
+    file_path_descriptions = os.path.join(
+        folder_path_descriptions, "descriptions.xlsx"
+    )
+    df_list = pd.read_excel(file_path_descriptions, engine="openpyxl")
     ensure_existence_sent_column(df_list, file_path_descriptions)
     files_count = df_list.shape[0]
 
@@ -269,17 +273,18 @@ def send_via_telegram_api(folder_path_descriptions, dict_config):
         if dict_file_data is False:
             break
         else:
-            file_path = dict_file_data['file_output']
-            print(f'{index+1}/{files_count} Uploading: {file_path}')
+            file_path = dict_file_data["file_output"]
+            print(f"{index+1}/{files_count} Uploading: {file_path}")
             send_file(dict_file_data, chat_id)
-            update_description_file_sent(file_path_descriptions,
-                                         dict_file_data)
+            update_description_file_sent(
+                file_path_descriptions, dict_file_data
+            )
 
 
 def test_chat_id(dict_config):
 
-    if 'chat_id' in dict_config.keys():
-        chat_id = dict_config['chat_id']
+    if "chat_id" in dict_config.keys():
+        chat_id = dict_config["chat_id"]
         is_int = isinstance(chat_id, int)
         if is_int:
             if chat_id < 0:
@@ -293,8 +298,7 @@ def test_chat_id(dict_config):
 
 def save_metadata_file(chat_id, chat_invite_link, file_path_metadata):
 
-    dict_metadata = {'chat_id': chat_id,
-                     'chat_invite_link': chat_invite_link}
+    dict_metadata = {"chat_id": chat_id, "chat_invite_link": chat_invite_link}
     create_txt(file_path_metadata, str(dict_metadata))
 
 
@@ -308,7 +312,7 @@ def process_to_send_telegram(folder_path_descriptions, dict_config):
             folder path where the descriptions.xlsx file is located
         dict_config (dict):
             configuration data.
-            template: {chat_id:negative int, create_new_channel:bolean}
+            template: {chat_id:negative int, create_new_channel:boolean}
 
     Returns:
         int: chat_id. negative integer
@@ -318,9 +322,9 @@ def process_to_send_telegram(folder_path_descriptions, dict_config):
     folder_script_path = os.path.realpath(folder_script_path_relative)
 
     # check if there is necessary to continue upload
-    file_path_metadata = \
-        os.path.realpath(os.path.join(folder_path_descriptions,
-                                      'channel_metadata'))
+    file_path_metadata = os.path.realpath(
+        os.path.join(folder_path_descriptions, "channel_metadata")
+    )
     continue_upload = False
     if os.path.exists(file_path_metadata):
         dict_metadata = eval(get_txt_content(file_path_metadata))
@@ -328,7 +332,7 @@ def process_to_send_telegram(folder_path_descriptions, dict_config):
 
     # get chat_id
     # Create new channel-Default True
-    if dict_config['create_new_channel_flag'] == 0 or continue_upload:
+    if dict_config["create_new_channel_flag"] == 0 or continue_upload:
         channel_new = False
     else:
         channel_new = True
@@ -341,10 +345,9 @@ def process_to_send_telegram(folder_path_descriptions, dict_config):
 
         # config new channel
         list_adms = get_list_adms(folder_script_path)
-        config_channel(chat_id,
-                       chat_invite_link,
-                       list_adms,
-                       folder_path_descriptions)
+        config_channel(
+            chat_id, chat_invite_link, list_adms, folder_path_descriptions
+        )
     else:
         # use existent channel
         if continue_upload:
@@ -354,7 +357,7 @@ def process_to_send_telegram(folder_path_descriptions, dict_config):
 
         chat_id_is_valid = test_chat_id(dict_data)
         if chat_id_is_valid:
-            chat_id = dict_data['chat_id']
+            chat_id = dict_data["chat_id"]
 
     return chat_id
 
