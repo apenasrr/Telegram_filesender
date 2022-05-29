@@ -42,5 +42,5 @@ def create_thumb(file_path):
     if os.path.exists(file_path_output):
         os.remove(file_path_output)
     # create thumb
-    os.system(f"ffmpeg -i {file_path} -vframes 1 {file_path_output}")
+    os.system(f'ffmpeg -i "{file_path}" -vframes 1 "{file_path_output}"')
     return file_path_output

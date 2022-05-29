@@ -1,3 +1,4 @@
+asyncio
 unidecode
 pyperclip
 pandas

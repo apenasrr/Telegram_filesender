@@ -5,3 +5,6 @@ chat_id = -0000000000000
 # 1 for yes
 # 0 for no
 create_new_channel = 1
+
+# Prevent stuck upload. Restart the file upload after this amount of minutes
+time_limit = 99

@@ -17,24 +17,27 @@
 """
 
 import os
+import sys
 import time
+
+import pandas as pd
 import pyautogui as pag
 import pyperclip
-import pandas as pd
+
 from api_telegram import (
-    send_file,
-    create_channel,
     add_chat_members,
-    promote_chat_members,
+    create_channel,
     export_chat_invite_link,
-    get_channel_title,
     get_channel_description,
-    set_chat_description,
+    get_channel_title,
     get_list_adms,
+    promote_chat_members,
+    send_file,
+    send_message,
+    set_chat_description,
 )
 from config_data import config_data
-import sys
-from utils_filesender import get_txt_content, create_txt
+from utils_filesender import create_txt, get_txt_content
 
 
 def ask_create_or_use():
@@ -167,6 +170,7 @@ def get_list_desc(folder_path_descriptions):
     )
     df_list = pd.read_excel(file_path_descriptions, engine="openpyxl")
 
+    # TODO: Consider using df.to_dict()
     list_desc = []
     for _, row in df_list.iterrows():
         d = {}
@@ -266,6 +270,12 @@ def send_via_telegram_api(folder_path_descriptions, dict_config):
     files_count = df_list.shape[0]
 
     chat_id = process_to_send_telegram(folder_path_descriptions, dict_config)
+    time_limit = int(dict_config["time_limit"])
+
+    # Connection test to avoid infinite loop of asynchronous attempts
+    # to send files without pause to fill connection pool
+    send_message("me", "telegram_filesender - test connection")
+    # TODO: Delete 'test connection' message
 
     while True:
         index, dict_file_data = get_next_video_to_send(file_path_descriptions)
@@ -275,7 +285,9 @@ def send_via_telegram_api(folder_path_descriptions, dict_config):
         else:
             file_path = dict_file_data["file_output"]
             print(f"{index+1}/{files_count} Uploading: {file_path}")
-            send_file(dict_file_data, chat_id)
+
+            send_file(dict_file_data, chat_id, time_limit)
+
             update_description_file_sent(
                 file_path_descriptions, dict_file_data
             )

@@ -44,15 +44,21 @@ def send_video(chat_id, file_path, caption):
 
     logging.info("Sending video...")
     try:
-        metadata = ffprobe(file_path).get_output_as_dict()["streams"][0]
+        metadata = ffprobe(file_path).get_output_as_dict()["streams"]
+        video_metadata = metadata[0]
     except:
-        # case of error, show all video metadata
+        # case of error, show all file metadata
         print(file_path)
         print(ffprobe(file_path).get_output_as_dict())
-        metadata = ffprobe(file_path).get_output_as_dict()["streams"][0]
-    width = metadata["width"]
-    height = metadata["height"]
-    duration = int(float(metadata["duration"]))
+        metadata = ffprobe(file_path).get_output_as_dict()["streams"]
+        video_metadata = metadata[0]
+    try:
+        width = video_metadata["width"]
+    except:
+        video_metadata = metadata[1]
+        width = video_metadata["width"]
+    height = video_metadata["height"]
+    duration = int(float(video_metadata["duration"]))
     thumb = utils_filesender.create_thumb(file_path)
     with Client("user", credentials.api_id, credentials.api_hash) as app:
         return_ = app.send_video(
@@ -156,7 +162,7 @@ def delete_messages(chat_id, list_message_id):
     return return_
 
 
-def send_file(dict_file_data, chat_id, time_limit=20):
+def send_file(dict_file_data, chat_id, time_limit=99):
 
     file_path = dict_file_data["file_output"]
     description = dict_file_data["description"]
@@ -239,6 +245,11 @@ def send_files(list_dict, chat_id, time_limit=20):
                     return_ = time_out.time_out(
                         sec_time_out, send_document, dict_params, restart=True
                     )
+                    # return_ = send_document(
+                    #     chat_id=chat_id,
+                    #     file_path=file_path,
+                    #     caption=description,
+                    # )
                 break
             except Exception as e:
                 print(e)
@@ -253,7 +264,7 @@ def create_channel(title, description):
 
     with Client("user", credentials.api_id, credentials.api_hash) as app:
         return_chat = app.create_channel(title=title, description=description)
-    chat_id = return_chat["id"]
+    chat_id = return_chat.id
     return chat_id
 
 
@@ -267,15 +278,17 @@ def promote_chat_members(chat_id, user_ids):
 
     with Client("user", credentials.api_id, credentials.api_hash) as app:
 
+        privileges_config = types.ChatPrivileges(
+            can_change_info=True,
+            can_post_messages=True,
+            can_edit_messages=True,
+            can_delete_messages=True,
+            can_promote_members=True,
+        )
+
         for user_id in user_ids:
             app.promote_chat_member(
-                chat_id=chat_id,
-                user_id=user_id,
-                can_change_info=True,
-                can_post_messages=True,
-                can_edit_messages=True,
-                can_delete_messages=True,
-                can_promote_members=True,
+                chat_id=chat_id, user_id=user_id, privileges=privileges_config
             )
 
 
