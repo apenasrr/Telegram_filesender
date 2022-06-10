@@ -48,7 +48,9 @@ def time_out(sec_time_out, func_, dict_params={}, restart=False):
 
         p.join()
         if restart:
-            time_out(sec_time_out, func_, dict_params, restart)
+            return_dict["return"] = time_out(
+                sec_time_out, func_, dict_params, restart
+            )
         else:
             return_dict["return"] = None
 
