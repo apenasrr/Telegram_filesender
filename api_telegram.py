@@ -44,21 +44,27 @@ def send_video(chat_id, file_path, caption):
 
     logging.info("Sending video...")
     try:
-        metadata = ffprobe(file_path).get_output_as_dict()["streams"]
-        video_metadata = metadata[0]
+        metadata = ffprobe(file_path).get_output_as_dict()
+        metadata_streams = metadata["streams"]
+        video_metadata = metadata_streams[0]
     except:
         # case of error, show all file metadata
         print(file_path)
         print(ffprobe(file_path).get_output_as_dict())
-        metadata = ffprobe(file_path).get_output_as_dict()["streams"]
-        video_metadata = metadata[0]
+        metadata = ffprobe(file_path).get_output_as_dict()
+        metadata_streams = metadata["streams"]
+        video_metadata = metadata_streams[0]
     try:
         width = video_metadata["width"]
     except:
-        video_metadata = metadata[1]
+        video_metadata = metadata_streams[1]
+    try:
         width = video_metadata["width"]
-    height = video_metadata["height"]
-    duration = int(float(video_metadata["duration"]))
+        height = video_metadata["height"]
+        duration = int(float(metadata["format"]["duration"]))
+    except Exception as e:
+        logging.error(f"File Error: {file_path}.\napi_telegram.py line 63")
+        raise ValueError(e)
     thumb = utils_filesender.create_thumb(file_path)
     with Client("user", credentials.api_id, credentials.api_hash) as app:
         return_ = app.send_video(
@@ -83,6 +89,15 @@ def send_sticker(chat_id, sticker):
     return return_
 
 
+def send_audio(chat_id, file_path, caption):
+    logging.info("Sending audio...")
+    with Client("user", credentials.api_id, credentials.api_hash) as app:
+        return_ = app.send_audio(
+            chat_id, file_path, caption=caption, progress=progress
+        )
+    return return_
+
+
 def send_document(chat_id, file_path, caption):
     logging.info("Sending document...")
     with Client("user", credentials.api_id, credentials.api_hash) as app:
@@ -95,7 +110,9 @@ def send_document(chat_id, file_path, caption):
 def send_message(chat_id, text):
     logging.info("Sending message...")
     with Client("user", credentials.api_id, credentials.api_hash) as app:
-        return_ = app.send_message(chat_id, text=text)
+        return_ = app.send_message(
+            chat_id, text=text, disable_web_page_preview=True
+        )
     return return_
 
 
@@ -170,6 +187,8 @@ def send_file(dict_file_data, chat_id, time_limit=99):
 
     if file_extension == ".mp4":
         type_file = "video"
+    elif file_extension == ".mp3":
+        type_file = "audio"
     else:
         type_file = "document"
 
@@ -181,11 +200,13 @@ def send_file(dict_file_data, chat_id, time_limit=99):
     sec_time_out = time_limit * 60
 
     if type_file == "video":
-
         return_ = time_out.time_out(
             sec_time_out, send_video, dict_params, restart=True
         )
-
+    elif type_file == "audio":
+        return_ = time_out.time_out(
+            sec_time_out, send_audio, dict_params, restart=True
+        )
     elif type_file == "document":
         return_ = time_out.time_out(
             sec_time_out, send_document, dict_params, restart=True
@@ -222,6 +243,8 @@ def send_files(list_dict, chat_id, time_limit=20):
 
         if file_extension == ".mp4":
             type_file = "video"
+        elif file_extension == ".mp3":
+            type_file = "audio"
         else:
             type_file = "document"
 
@@ -239,7 +262,10 @@ def send_files(list_dict, chat_id, time_limit=20):
                     return_ = time_out.time_out(
                         sec_time_out, send_video, dict_params, restart=True
                     )
-
+                elif type_file == "audio":
+                    return_ = time_out.time_out(
+                        sec_time_out, send_audio, dict_params, restart=True
+                    )
                 elif type_file == "document":
 
                     return_ = time_out.time_out(
