@@ -3,6 +3,7 @@ import os
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
 from pyrogram import Client, types
 
@@ -83,9 +84,20 @@ def send_video(chat_id, file_path, caption):
 
 
 def send_sticker(chat_id, sticker):
-    logging.info("Sending document...")
+
+    logging.info("Sending sticker...")
     with Client("user", credentials.api_id, credentials.api_hash) as app:
         return_ = app.send_sticker(chat_id, sticker)
+    return return_
+
+
+def send_photo(chat_id, file_path, caption):
+
+    logging.info("Sending photo...")
+    with Client("user", credentials.api_id, credentials.api_hash) as app:
+        return_ = app.send_photo(
+            chat_id, file_path, caption=caption, progress=progress
+        )
     return return_
 
 
@@ -159,6 +171,7 @@ def get_list_media_doc(list_dict_sent_doc):
         file_id = dict_sent_doc["file_id"]
         caption = dict_sent_doc["caption"]
         media = types.InputMediaDocument(media=file_id, caption=caption)
+
         list_media_doc.append(media)
     return list_media_doc
 
@@ -183,12 +196,13 @@ def send_file(dict_file_data, chat_id, time_limit=99):
 
     file_path = dict_file_data["file_output"]
     description = dict_file_data["description"]
-    file_extension = os.path.splitext(file_path.lower())[1]
-
+    file_extension = Path(file_path).suffix
     if file_extension == ".mp4":
         type_file = "video"
     elif file_extension == ".mp3":
         type_file = "audio"
+    elif file_extension in [".png", ".jpg", ".jpeg", ".gif"]:
+        type_file = "photo"
     else:
         type_file = "document"
 
@@ -207,6 +221,10 @@ def send_file(dict_file_data, chat_id, time_limit=99):
         return_ = time_out.time_out(
             sec_time_out, send_audio, dict_params, restart=True
         )
+    elif type_file == "photo":
+        return_ = time_out.time_out(
+            sec_time_out, send_photo, dict_params, restart=True
+        )
     elif type_file == "document":
         return_ = time_out.time_out(
             sec_time_out, send_document, dict_params, restart=True
@@ -216,7 +234,7 @@ def send_file(dict_file_data, chat_id, time_limit=99):
 
 
 def send_files(list_dict, chat_id, time_limit=20):
-    """[summary]
+    """Sends a series of files to the same chat_id
 
     Args:
         list_dict (list): list of dict. dict with keys:
@@ -238,13 +256,16 @@ def send_files(list_dict, chat_id, time_limit=20):
         print(f"{dt_string}-{order}/{len_list_dict} Uploading: {file_path}")
         logging.info(f"{order}/{len_list_dict} Uploading: {file_path}")
 
-        file_extension = os.path.splitext(file_path.lower())[1]
+        # file_extension = os.path.splitext(file_path.lower())[1]
+        file_extension = Path(file_path).suffix
         description = d["description"]
 
         if file_extension == ".mp4":
             type_file = "video"
         elif file_extension == ".mp3":
             type_file = "audio"
+        elif file_extension in [".png", ".jpg", ".jpeg", ".gif"]:
+            type_file = "photo"
         else:
             type_file = "document"
 
@@ -265,6 +286,10 @@ def send_files(list_dict, chat_id, time_limit=20):
                 elif type_file == "audio":
                     return_ = time_out.time_out(
                         sec_time_out, send_audio, dict_params, restart=True
+                    )
+                elif type_file == "photo":
+                    return_ = time_out.time_out(
+                        sec_time_out, send_photo, dict_params, restart=True
                     )
                 elif type_file == "document":
 
