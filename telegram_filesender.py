@@ -27,6 +27,7 @@ import pyperclip
 from api_telegram import (
     add_chat_members,
     create_channel,
+    ensure_connection,
     export_chat_invite_link,
     get_channel_description,
     get_channel_title,
@@ -196,21 +197,18 @@ def paste_on_telegram_app(desc):
 def ask_send_app_or_api():
 
     str_msg_1 = "How do you intend to send the files?"
-    str_msg_2 = "1-By telegram desktop app (default)"
-    str_msg_3 = "2-By telegram api\n"
+    str_msg_2 = "1-By telegram desktop app"
+    str_msg_3 = "2-By telegram api (default)\n"
     str_msg_answer = "Type the number: "
 
-    print(str_msg_1)
-    print(str_msg_2)
-    print(str_msg_3)
+    print("\n".join([str_msg_1, str_msg_2, str_msg_3]))
 
     answer = input(str_msg_answer)
 
     if answer == "":
-        return 1
+        return 2
 
-    int_answer = int(answer)
-    return int_answer
+    return int(answer)
 
 
 def send_via_telegram_app(list_desc):
@@ -274,8 +272,8 @@ def send_via_telegram_api(folder_path_descriptions, dict_config):
 
     # Connection test to avoid infinite loop of asynchronous attempts
     # to send files without pause to fill connection pool
-    send_message("me", "telegram_filesender - test connection")
-    # TODO: Delete 'test connection' message
+
+    ensure_connection()
 
     while True:
         index, dict_file_data = get_next_video_to_send(file_path_descriptions)

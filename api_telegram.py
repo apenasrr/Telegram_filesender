@@ -7,7 +7,6 @@ from pathlib import Path
 
 from pyrogram import Client, types
 
-import credentials
 import time_out
 import utils_filesender
 from ffprobe_micro import ffprobe
@@ -29,6 +28,35 @@ def logging_config():
     console.setFormatter(formatter)
     # add the handler to the root logger
     logging.getLogger("").addHandler(console)
+
+
+def ensure_connection():
+
+    if Path("user.session").exists():
+        try:
+            with Client("user") as app:
+                message = app.send_message(
+                    "me", text="telegram filesender-Connected..."
+                )
+                message.delete()
+            return
+        except:
+            print("Delete Session file and try again.")
+
+    while True:
+        try:
+            api_id = int(input("Enter your api_id: "))
+            api_hash = input("Enter your api_hash: ")
+
+            with Client("user", api_id, api_hash) as app:
+                message = app.send_message(
+                    "me", text="telegram filesender-Connected..."
+                )
+                message.delete()
+            return
+        except:
+            print("\nError. Try again.\n")
+            pass
 
 
 # Keep track of the progress while uploading
@@ -67,7 +95,8 @@ def send_video(chat_id, file_path, caption):
         logging.error(f"File Error: {file_path}.\napi_telegram.py line 63")
         raise ValueError(e)
     thumb = utils_filesender.create_thumb(file_path)
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+
+    with Client("user") as app:
         return_ = app.send_video(
             chat_id,
             file_path,
@@ -86,7 +115,7 @@ def send_video(chat_id, file_path, caption):
 def send_sticker(chat_id, sticker):
 
     logging.info("Sending sticker...")
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.send_sticker(chat_id, sticker)
     return return_
 
@@ -94,7 +123,7 @@ def send_sticker(chat_id, sticker):
 def send_photo(chat_id, file_path, caption):
 
     logging.info("Sending photo...")
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.send_photo(
             chat_id, file_path, caption=caption, progress=progress
         )
@@ -103,7 +132,7 @@ def send_photo(chat_id, file_path, caption):
 
 def send_audio(chat_id, file_path, caption):
     logging.info("Sending audio...")
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.send_audio(
             chat_id, file_path, caption=caption, progress=progress
         )
@@ -112,7 +141,7 @@ def send_audio(chat_id, file_path, caption):
 
 def send_document(chat_id, file_path, caption):
     logging.info("Sending document...")
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.send_document(
             chat_id, file_path, caption=caption, progress=progress
         )
@@ -120,8 +149,9 @@ def send_document(chat_id, file_path, caption):
 
 
 def send_message(chat_id, text):
+
     logging.info("Sending message...")
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.send_message(
             chat_id, text=text, disable_web_page_preview=True
         )
@@ -129,8 +159,9 @@ def send_message(chat_id, text):
 
 
 def pin_chat_message(chat_id, message_id):
+
     logging.info("Pinning message...")
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.pin_chat_message(
             chat_id, message_id=message_id, both_sides=True
         )
@@ -139,14 +170,14 @@ def pin_chat_message(chat_id, message_id):
 
 def get_messages(chat_id, message_ids):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.get_messages(chat_id, message_ids)
     return return_
 
 
 def get_history(chat_id):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.get_history(chat_id)
     return return_
 
@@ -178,14 +209,14 @@ def get_list_media_doc(list_dict_sent_doc):
 
 def send_media_group(chat_id, list_media):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.send_media_group(chat_id, media=list_media)
     return return_
 
 
 def delete_messages(chat_id, list_message_id):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.delete_messages(
             chat_id=chat_id, message_ids=list_message_id
         )
@@ -313,7 +344,7 @@ def send_files(list_dict, chat_id, time_limit=20):
 
 def create_channel(title, description):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_chat = app.create_channel(title=title, description=description)
     chat_id = return_chat.id
     return chat_id
@@ -321,13 +352,13 @@ def create_channel(title, description):
 
 def add_chat_members(chat_id, user_ids):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_chat = app.add_chat_members(chat_id=chat_id, user_ids=user_ids)
 
 
 def promote_chat_members(chat_id, user_ids):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
 
         privileges_config = types.ChatPrivileges(
             can_change_info=True,
@@ -345,13 +376,13 @@ def promote_chat_members(chat_id, user_ids):
 
 def set_chat_description(chat_id, description):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         app.set_chat_description(chat_id=chat_id, description=description)
 
 
 def export_chat_invite_link(chat_id):
 
-    with Client("user", credentials.api_id, credentials.api_hash) as app:
+    with Client("user") as app:
         return_ = app.export_chat_invite_link(chat_id=chat_id)
 
     return return_
@@ -409,25 +440,3 @@ def get_config_chat_id(folder_path):
     split_chat_id = chat_id_raw.split("=")
     chat_id = int(split_chat_id[1])
     return chat_id
-
-
-def main():
-
-    d = {}
-    list_dict = []
-
-    d["file_path"] = os.path.join("files", "teste.mp4")
-    d["description"] = "exemplo de descricao de video **negrita**"
-    list_dict.append(d)
-
-    d = {}
-    d["file_path"] = os.path.join("files", "teste.xlsx")
-    d["description"] = "exemplo de descricao de arquio **negrita**"
-    list_dict.append(d)
-
-    send_files(list_dict)
-
-
-if __name__ == "__main__":
-    logging_config()
-    main()
