@@ -6,3 +6,4 @@ pandas
 pyrogram
 pyautogui
 tgcrypto
+openpyxl
