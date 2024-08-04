@@ -3,6 +3,6 @@ unidecode
 openpyxl
 pyperclip
 pandas
-pyrogram
+pyrofork
 pyautogui
 tgcrypto
